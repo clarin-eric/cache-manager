@@ -1,4 +1,4 @@
-package eu.clarin.clarincm;
+package eu.clarin.cm;
 
 import org.mapdb.DB;
 import org.springframework.cache.Cache;
