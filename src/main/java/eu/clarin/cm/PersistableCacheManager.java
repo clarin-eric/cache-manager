@@ -61,27 +61,22 @@ public class PersistableCacheManager implements CacheManager {
 
         if(this.expiration != null){
 
-            Arrays.stream(this.expiration.split(",")).forEach(expression -> {
+            Matcher matcher = patter.matcher(this.expiration);
 
-                expression = expression.replace(" ", "");
+            while(matcher.find()){
 
-                Matcher matcher = patter.matcher(expression);
+                if(matcher.group(2) != null){ // this would be the specific cache name
 
-                if(matcher.matches()){
+                    this.db.hashSet(matcher.group(2))
+                            .expireAfterCreate(Long.valueOf(matcher.group(3)), this.getTimeUnit(matcher.group(4))).create();
 
-                    if(matcher.group(2) != null){ // this would be the specific cache name
-
-                        this.db.hashSet(matcher.group(2))
-                                .expireAfterCreate(Long.valueOf(matcher.group(3)), this.getTimeUnit(matcher.group(4))).create();
-
-                    }
-                    else{ // it's a general setting
-
-                        this.generalExpirationValue = Long.valueOf(matcher.group(3));
-                        this.generalExpirationTimeUnit = this.getTimeUnit(matcher.group(4));
-                    }
                 }
-            });
+                else{ // it's a general setting
+
+                    this.generalExpirationValue = Long.valueOf(matcher.group(3));
+                    this.generalExpirationTimeUnit = this.getTimeUnit(matcher.group(4));
+                }
+            }
         }
     }
 
@@ -105,6 +100,4 @@ public class PersistableCacheManager implements CacheManager {
             default -> null;
         };
     }
-
-
 }
